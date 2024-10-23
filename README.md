@@ -19,5 +19,5 @@ reduce bandwidth and then streamed over the TCP connection.
 * The server will receive the audio stream, decode it if necessary, and play it on the
 system's speakers in real-time.
 * The server should be capable of managing multiple connections and enforcing the
-rule that only one client can speak at a time (First-Come-First-Served basis). [Single
-threaded/process simple TCP server is sufficien
+rule that only one client can speak at a time (First-Come-First-Served basis). Single
+threaded/process simple TCP server is sufficient
