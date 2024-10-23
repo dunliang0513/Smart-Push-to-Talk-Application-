@@ -1,0 +1,9 @@
+# Backend Python Dependencies
+flask==3.0.2
+python-socketio==5.11.1
+numpy==1.26.4
+pyaudio==0.2.14
+opus-python==0.8.1
+sounddevice==0.4.6
+python-dotenv==1.0.1
+eventlet==0.35.1

@@ -21,3 +21,42 @@ system's speakers in real-time.
 * The server should be capable of managing multiple connections and enforcing the
 rule that only one client can speak at a time (First-Come-First-Served basis). Single
 threaded/process simple TCP server is sufficient
+
+## Setup Instructions
+
+### Backend Setup
+1. Create a Python virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+2. Install Python dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+### Frontend Setup
+1. Install Node.js dependencies:
+```bash
+npm install
+```
+
+2. Start the development server:
+```bash
+npm run dev
+```
+
+## System Requirements
+- Python 3.8 or higher
+- Node.js 18 or higher
+- npm 8 or higher
+- Working microphone
+- Modern web browser with WebAudio API support
+
+## Features
+- Real-time audio streaming
+- Push-to-Talk functionality
+- TCP-based communication
+- Student name registration
+- Audio quality control
