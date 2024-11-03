@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Push-to-Talk</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #talkButton {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #007bff;
+            color: white;
+            font-size: 20px;
+            border: none;
+            cursor: pointer;
+        }
+        #talkButton:active {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <button id="talkButton">Hold to Talk</button>
+    
+    <script>
+        const button = document.getElementById('talkButton');
+        let socket;
+        let mediaRecorder;
+        let audioStream;
+
+        // Request microphone access only once when the page loads
+        async function initializeAudio() {
+            try {
+                // Get user permission for microphone access
+                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            } catch (err) {
+                console.error("Error accessing microphone:", err);
+                alert("Microphone access is required to use this application.");
+            }
+        }
+
+        // Initialize microphone access on page load
+        window.onload = initializeAudio;
+
+        // Function to handle button press
+        function startRecording() {
+            if (!audioStream) {
+                console.error("Microphone not initialized.");
+                return;
+            }
+
+            // Create a new WebSocket connection
+            socket = new WebSocket('ws://127.0.0.1:65432');
+            socket.binaryType = 'arraybuffer';
+
+            // Initialize the MediaRecorder with the existing audio stream
+            mediaRecorder = new MediaRecorder(audioStream, { mimeType: 'audio/webm' });
+
+            mediaRecorder.ondataavailable = event => {
+                if (socket.readyState === WebSocket.OPEN) {
+                    socket.send(event.data);
+                }
+            };
+
+            // Start sending audio data in 100ms chunks
+            mediaRecorder.start(100);
+
+            // Close the WebSocket when recording stops
+            mediaRecorder.onstop = () => {
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.close();
+                }
+            };
+        }
+
+        // Function to handle button release
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                mediaRecorder.stop();
+            }
+        }
+
+        // Attach event listeners to the button
+        button.addEventListener('mousedown', startRecording);
+        button.addEventListener('mouseup', stopRecording);
+    </script>
+</body>
+</html>

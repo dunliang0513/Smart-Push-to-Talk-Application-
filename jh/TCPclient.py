@@ -1,32 +1,37 @@
-# Demo Simple TCP Echo Client
-# (c) Author: Bhojan Anand
-# Last Modified: 2023 Sep
-# Course: CS3103/CS2105
-# School of Computing, NUS
-# Note: Code does not follow best pratices such as exception handling etc.
+import asyncio
+import websockets
+import pyaudio
 
-import socket
+HOST = "127.0.0.1"
+PORT = 65432
 
-HOST = "127.0.0.1"  # The server's hostname or IP address
-PORT = 65432  # The port used by the server
-name = input('Please enter your name: ')
+# Initialize PyAudio
+audio = pyaudio.PyAudio()
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    # Connect to the host, post
-    s.connect((HOST, PORT))
+# Open an output stream to play audio
+stream = audio.open(format=pyaudio.paInt16,
+                    channels=1,
+                    rate=44100,
+                    output=True)
 
-    # Define the data to be sent
-    senddata = input(f"Enter message: ")
-    while senddata:
-        senddata = f'{name}: {senddata}'
-        # Encoding the data as UTF-8 as bytes
-        senddatabytes = senddata.encode(encoding = 'UTF-8')
-        # print("Data to send: " , senddatabytes)
+async def handle_client(websocket, path):
+    print("Client connected")
+    try:
+        async for message in websocket:
+            # Write received audio data to output stream
+            stream.write(message)
+    except websockets.exceptions.ConnectionClosed:
+        print("Client disconnected")
 
-        s.sendall(senddatabytes)
+async def main():
+    async with websockets.serve(handle_client, HOST, PORT):
+        print(f"Server listening on ws://{HOST}:{PORT}")
+        await asyncio.Future()  # Run forever
 
-        # recvdata is the data received from server
-        recvdata = s.recv(1024) 
-        print(f"Received {recvdata}")  #formatted string, includes substituions python 3.6 and above
-        senddata = input("Your data:")
-    s.close()
+try:
+    asyncio.run(main())
+finally:
+    # Cleanup PyAudio resources when the server is stopped
+    stream.stop_stream()
+    stream.close()
+    audio.terminate()
