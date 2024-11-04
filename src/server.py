@@ -11,7 +11,7 @@ from websockets.exceptions import ConnectionClosed
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-HOST = "172.31.74.36"
+HOST = "172.31.50.171"
 WS_PORT = 65432  # WebSocket port
 CHUNK_SIZE = 1024
 
